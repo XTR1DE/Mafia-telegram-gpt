@@ -23,26 +23,80 @@
 2. • pip install pyTelegramBotAPI
 3. • pip install python-dotenv
 
-## Использование.
-
-1. • Создайте .env файл. Загрузите токен телеграмм бота в .env, полученный от BotFather в Telegram. -> TG-TOKEN = "Ваш токен"
-2. • Запустите файл bot.py
-3. • В телеграмм боте напишите /start
 
 ## Настройка и запуск.
 
 1. • Создайте файл .env в корне проекта.
 2. • Добавьте ваш токен Telegram бота, полученный у BotFather:
 		TG_TOKEN=ваш_токен
-3. • Запустите бота:
-4. • В Telegram напишите /start, чтобы начать взаимодействие.
+```.env
+TG-TOKEN = "Ваш токен, полученный от BotFather"
+```
+
+4. • Запустите бота:
+5. • В Telegram напишите /start, чтобы начать взаимодействие.
 
 
 ## Настройка сцен и нейросетей.
 
-1. • Для добавления или изменения сцен редактируйте файл Mafia/game.py в функции scene_update().
-2. • Для изменения используемой нейросети редактируйте файл Mafia-telegram-gpt-only/GPT_Requests/request_gpt.py.
-3. • Если хотите использовать оригинальный GPT API, адаптируйте функцию gpt() под нужный API, сохранив входные и выходные переменные.
+2. • Для добавления или изменения сцен редактируйте файл Mafia/game.py в функции scene_update().
+```python
+    def scene_update(self):
+        self.scene = {
+            'Участники': f"В игре участвуют {len(self.names)} игроков: {', '.join(self.names)}. Из них затаились {len(self.mafia)} мафии. Вам предстоит найти их. Представьтесь пожалуйста.",
+            'Ночь мафии': 'Начинается ночь, город засыпает, просыпается мафия, мафия выбирает кого убить',
+            "Выбор мафии": f"Мафия сделала выбор",
+            'Ночь шерифа': 'Мафия засыпает. Просыпается шериф выбирает кого он хочет проверить',
+            'Выбор шерифа': f'Шериф сделал выбор, шериф засыпает. Наступает новый день, город просыпается, кроме {self.kills}',
+            'Обсуждение': 'Обсуждение',
+            'Обсуждение2': 'Продолжаем обсуждение. Последний раунд перед голосованием.',
+
+	    'Обсуждение3': "Подводите итоги, кого хотите кикнуть", # <---- Можно добавлять или удалять сцены
+
+            'Голосование': 'Обсуждение закончилось, начинает голосование, все игроки обязаны назвать имя игрока. Игрок, набравший большинство голосов выбывает.',
+            'Конец голосование': f'Голосование закончилось, игрок {self.kicked} Выбывает из игры. Он был - {self.kicked_role}',
+        }
+```
+4. • Если хотите более живую игру, то следует выбрать более сильную нейросеть. Для изменения используемой нейросети редактируйте файл Mafia-telegram-gpt-only/GPT_Requests/request_gpt.py.
+```python
+def gpt(message: str, context: str, prompt: str, provider = g4f.Provider.Chatai, model="gpt-4o"):
+    try:
+        full_prompt = f"{context}\n{prompt}\n{message} Не пиши слишком большие сообщения."
+        response = g4f.ChatCompletion.create(
+            provider=provider, # <--- Здесь можете подобрать более подходящий провайдер. Используйте документацию от g4f(xtekky)
+            model=g4f.models.default, # <--- Здесь можете выбрать модель нейросети.  Используйте документацию от g4f(xtekky)
+            stream=False,
+            messages=[
+                {"role": "assistant", "content": full_prompt},
+                {"role": "user", "content": f"{message}"},
+            ],
+        )
+        return response
+    except Exception as e:
+        print(e)
+        return "None"
+```
+5. • Если хотите использовать оригинальный GPT API, адаптируйте функцию gpt() под нужный API, сохранив входные и выходные переменные. Пример для OpenAi
+```python
+from openai import OpenAI
+
+def gpt(message: str, context: str, prompt: str, provider=None, model="gpt-4o"): # <--- Входные данные должны быть, как и в начальном виде
+    try:
+        client = OpenAI()
+        full_prompt = f"{context}\n{prompt}\n{message} Не пиши слишком большие сообщения."
+
+        completion = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "assistant", "content": full_prompt},
+                {"role": "user", "content": message},
+            ],
+        )
+        return completion.choices[0].message.content # <--- Выходящий ответ должен быть ответ gpt : str
+    except Exception as e:
+        print(e)
+        return "None"
+```
 
 ##
 ## by XTR1DE
