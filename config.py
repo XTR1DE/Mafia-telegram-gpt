@@ -4,5 +4,6 @@ _russian_roles = {
     "peace": "Мирный",
     "mafia": "Мафия",
     "sheriff": "Шериф",
+    "doctor": "Доктор",
     "general": "Система",
 }
