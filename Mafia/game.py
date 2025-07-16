@@ -83,14 +83,15 @@ class Mafia:
 
     def kill(self, name: str):
         if name in self.status_players:  # Проверяем, существует ли игрок
-            self.status_players[name] = "dead"
-            self.all_kills.append(name)
-            change_status(name, "dead")
-            self.scene_update()
-            print("\n", self.status_players, "\n")
+            if name != self.healed:
+                self.status_players[name] = "dead"
+                self.all_kills.append(name)
+                change_status(name, "dead")
+                self.scene_update()
+                print("\n", self.status_players, "\n")
 
-            # Проверка на конец игры после убийства
-            self.check_game_over()
+                # Проверка на конец игры после убийства
+                self.check_game_over()
         else:
             print(f"Ошибка: Игрок {name} не найден в списке игроков.")
 
