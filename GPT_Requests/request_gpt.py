@@ -6,8 +6,7 @@ def gpt(message: str, context: str, prompt: str, provider = g4f.Provider.Chatai,
     try:
         full_prompt = f"{context}\n{prompt}\n{message} Не пиши слишком большие сообщения."
         response = g4f.ChatCompletion.create(
-            provider=provider,
-            model=g4f.models.default,
+            model=g4f.models.gpt_4_1_nano,
             stream=False,
             messages=[
                 {"role": "assistant", "content": full_prompt},

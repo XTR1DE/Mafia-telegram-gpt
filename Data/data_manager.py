@@ -51,9 +51,11 @@ def addhistory(name, message, scene = None):
     for i in data['personal']:
         if i['name'] != name and i['status'] == 'play' and i['role'] != 'system':
             if scene not in ["Ночь мафии", "Ночь шерифа", "Ночь доктора"]:
-                i['history'].append(f"{name}: {message}")
+                i['history'].append(f"{name}:[ "
+                                    f"{message} "
+                                    f"]")
             else:
-                i['history'].append(f"{scene}: Кто-то выполнил действие.")
+                i['history'].append(f"{scene}: Кто-то возможно выполнил действие.")
     with open('info.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
