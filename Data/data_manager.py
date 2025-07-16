@@ -50,7 +50,7 @@ def addhistory(name, message, scene = None):
 
     for i in data['personal']:
         if i['name'] != name and i['status'] == 'play' and i['role'] != 'system':
-            if scene not in ["Ночь мафии", "Ночь шерифа"]:
+            if scene not in ["Ночь мафии", "Ночь шерифа", "Ночь доктора"]:
                 i['history'].append(f"{name}: {message}")
             else:
                 i['history'].append(f"{scene}: Кто-то выполнил действие.")
