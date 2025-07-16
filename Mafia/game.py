@@ -68,7 +68,7 @@ class Mafia:
         if available_names:
             self.sheriff = random.choice(available_names)
 
-        # Инициализируем статус и голоса для каждого игрока
+        # Статус и голоса для каждого игрока
         for name in self.names:
             self.status_players.setdefault(name, "play")
             self.vote_count.setdefault(name, 0)
@@ -292,11 +292,11 @@ class Mafia:
                     print(scene)
 
                     if scene == "Ночь мафии":
-                        self.handle_mafia_night()  # Используем новую функцию для обработки ночи мафии
+                        self.handle_mafia_night()
                         time.sleep(1)
 
                     elif scene == "Голосование":
-                        self.handle_voting()  # Вызываем функцию для обработки голосования
+                        self.handle_voting()
                         time.sleep(1)
 
                     else:
@@ -312,7 +312,7 @@ class Mafia:
                                         self.checked = [n for n in self.names if n in response][0]
                                     except IndexError:
                                         print("Ошибка: Не удалось извлечь имя жертвы из ответа мафии")
-                                        self.checked = None  # Или какое-то другое значение по умолчанию
+                                        self.checked = None
 
                                     if self.checked:
                                         checked_role = "Мафия" if self.checked in self.mafia else "Мирный житель"
