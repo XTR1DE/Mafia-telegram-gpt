@@ -63,8 +63,8 @@ def gpt(message: str, context: str, prompt: str, provider = g4f.Provider.Chatai,
     try:
         full_prompt = f"{context}\n{prompt}\n{message} Не пиши слишком большие сообщения."
         response = g4f.ChatCompletion.create(
-            provider=provider, # <--- Здесь можете подобрать более подходящий провайдер. Используйте документацию от g4f(xtekky)
-            model=g4f.models.default, # <--- Здесь можете выбрать модель нейросети.  Используйте документацию от g4f(xtekky)
+            provider=provider, # <--- Здесь можете подобрать более подходящий провайдер. Используйте документацию от библиотеки g4f
+            model=g4f.models.default, # <--- Здесь можете выбрать модель нейросети.  Используйте документацию от библиотеки g4f
             stream=False,
             messages=[
                 {"role": "assistant", "content": full_prompt},
@@ -76,13 +76,18 @@ def gpt(message: str, context: str, prompt: str, provider = g4f.Provider.Chatai,
         print(e)
         return "None"
 ```
-5. • Если хотите использовать оригинальный GPT API, адаптируйте функцию gpt() под нужный API, сохранив входные и выходные переменные. Пример для OpenAi
+5. • Если хотите использовать оригинальный GPT API, адаптируйте функцию gpt() под нужный API, сохранив входные и выходные переменные. Пример для OpenAi и gemini
+   
+## Пример для OpenAi
+
 ```python
 from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
-def gpt(message: str, context: str, prompt: str, provider=None, model="gpt-4o"): # <--- Входные данные должны быть, как и в начальном виде
+def gpt(message: str, context: str, prompt: str, provider=None, model=None): # <--- Входные данные должны быть, как и в начальном виде
     try:
-        client = OpenAI()
+        client = OpenAI(api_key=os.getenv("GPT-TOKEN")) # <--- Загрузить api key добавить в .env GPT-TOKEN = "Ваш токен от openai"
         full_prompt = f"{context}\n{prompt}\n{message} Не пиши слишком большие сообщения."
 
         completion = client.chat.completions.create(
@@ -97,6 +102,31 @@ def gpt(message: str, context: str, prompt: str, provider=None, model="gpt-4o"):
         print(e)
         return "None"
 ```
+
+## Пример для Gemini
+ 
+```python
+import google.generativeai as genai
+from dotenv import load_dotenv
+load_dotenv()
+
+def gpt(message: str, context: str, prompt: str, provider=None, model=None): # <--- Входные данные должны быть, как и в начальном виде
+    try:
+        full_prompt = f"{context}\n{prompt}\n{message}. Не пиши очень длинные сообщение."
+
+        genai.configure(api_key=os.getenv("GPT-TOKEN")) # <--- Загрузить api key добавить в .env GPT-TOKEN = "Ваш токен от gemini"
+
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
+
+        response = model.generate_content(full_prompt)
+        return response.text
+
+    except Exception as e:
+        print(e)
+        return "None"
+```
+
+## Для более живой игры использовать варианты с Gemini(Есть бесплатный план) и OpenAi(Платная)
 
 ##
 ## by XTR1DE
