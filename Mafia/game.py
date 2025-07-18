@@ -137,12 +137,18 @@ class Mafia:
 
 
 
-    def answer_to_scene(self, name, scene):
+        def answer_to_scene(self, name, scene):
         player_history = check_info(name, "history")
         player_history_str = "\n".join(player_history) if player_history else ""
 
         role = check_info(name, "role")
         role_name = _russian_roles[role]
+
+        alive_players = ", ".join([n for n in self.names if self.status_players[n] == 'play'])
+        dead_players = ", ".join([n for n in self.names if self.status_players[n] == 'dead'])
+        kick_players = ", ".join([n for n in self.all_kicked])
+        checked_info = ", ".join([n for n in self.names if n in self.all_checked])
+        mafias = ", ".join(self.mafia)
 
         if role == "mafia":
             goals = "Ваша цель - устранить всех мирных жителей, оставаясь нераскрытым. "
@@ -152,43 +158,42 @@ class Mafia:
             goals = "Ваша цель - выявить всех членов мафии и помочь другим мирным жителям их казнить. "
 
         if scene == "Обсуждение":
-            task = f"Вам нужно участвовать в обсуждении, анализировать поведение других игроков и делиться своими подозрениями. Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}. "
+            task = f"Вам нужно участвовать в обсуждении, анализировать поведение других игроков и делиться своими подозрениями. Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players} "
 
         elif scene == "Обсуждение2":
-            task = f"Финальное раунд перед голосованием. Делитесь подозрениями и выдвигайте претендентов на вылет. Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}. "
+            task = f"Финальное раунд перед голосованием. Делитесь подозрениями и выдвигайте претендентов на вылет. Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players}. "
 
         elif scene == "Голосование":
-            podtask1 = f"Старайся не голосовать за своих напарников мафии {", ".join(self.mafia)}. Можешь голосовать за них, если их подозревают и чтобы отвлечь игроков от тебя. "
-            podtask2 = f"Вам нужно проголосовать за игрока, которого вы подозреваете в том, что он мафия. Сейчас идет голосование. Ваша задача - проголосовать за игрока, которого вы считаете мафией. Напишите *только имя* этого игрока и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}. "
+            podtask1 = f"Старайся не голосовать за своих напарников мафии {mafias}. Можешь голосовать за них, если их подозревают и чтобы отвлечь игроков от тебя. "
+            podtask2 = f"Вам нужно проголосовать за игрока, которого вы подозреваете в том, что он мафия. Сейчас идет голосование. Ваша задача - проголосовать за игрока, которого вы считаете мафией. Напишите *только имя* этого игрока и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players}. "
             task = podtask1 + podtask2 if role == "mafia" else podtask2
 
         elif scene == "Ночь мафии" and role == "mafia":
-            task = f"Вам нужно выбрать игрока, которого вы хотите убить. Напиши только имя и ничего больше (например: Егор). Не убивай своих напарников {", ".join(self.mafia)}. Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}"
+            task = f"Вам нужно выбрать игрока, которого вы хотите убить. Напиши только имя и ничего больше (например: Егор). Не убивай своих напарников {mafias}. Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players}"
 
         elif scene == "Ночь шерифа" and role == "sheriff":
-            task = f"Вам нужно выбрать игрока, которого вы хотите проверить и узнать его роль. Напиши только имя и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}. Не имеет смысл проверять игроков, которых ты уже проверил: {", ".join([n for n in self.names if n in self.all_checked])}"
+            task = f"Вам нужно выбрать игрока, которого вы хотите проверить и узнать его роль. Напиши только имя и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players}. Не имеет смысл проверять игроков, которых ты уже проверил: {checked_info}"
 
         elif scene == "Ночь доктора" and role == "doctor":
-            task = f"Вам нужно выбрать игрока, которого вы хотите вылечить ночью. Выбирайте с умом. Лучше всего спасть ценных игроков. Например шерифа или основывайся на интуиции и выбирать, кого считаешь нужным. Напиши только имя и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {", ".join([x for x in self.names if self.status_players[x] != 'play'])}"
+            task = f"Вам нужно выбрать игрока, которого вы хотите вылечить ночью. Выбирайте с умом. Лучше всего спасть ценных игроков. Например шерифа или основывайся на интуиции и выбирать, кого считаешь нужным. Напиши только имя и ничего больше (например: Егор). Не выбирайте умерших или выгнанных игроков: {dead_players}, {kick_players}"
 
         else:
             task = self.scene[scene]
 
         task += f"Никогда не выбирай себя ({name}). Даже когда тебя все выбирают. "
-        game_state = f"В игре участвуют: {', '.join([n for n in self.names if self.status_players[n] == 'play'])}. "
-        dead_players = [n for n in self.names if self.status_players[n] == 'dead']
-        kick_players = [n for n in self.all_kicked]
+        game_state = f"В игре участвуют: {alive_players}. "
+
         if dead_players:
-            game_state += f"Были убиты мафией: {', '.join(dead_players)}. Их нельзя выбирать для голосования. "
+            game_state += f"Были убиты мафией: {dead_players}. Их нельзя выбирать для голосования. "
         if kick_players:
-            game_state += f"Выгнанные: {', '.join(kick_players)}. Их нельзя выбирать для голосования. "
+            game_state += f"Выгнанные: {kick_players}. Их нельзя выбирать для голосования. "
 
 
         context = f"Вы - {name}, {role_name}.\n{goals}\n{task}\n{game_state}\nИстория {name}:\n{player_history_str}"
 
         print('\n', context, '\n')
         return (self.scene[scene], context, check_info(name, "prompt"))
-
+        
     def check_game_over(self):
         """Проверка окончание игры"""
         alive_mafia = sum(1 for name in self.mafia if self.status_players.get(name) == "play")
