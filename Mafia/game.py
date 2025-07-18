@@ -137,7 +137,7 @@ class Mafia:
 
 
 
-        def answer_to_scene(self, name, scene):
+    def answer_to_scene(self, name, scene):
         player_history = check_info(name, "history")
         player_history_str = "\n".join(player_history) if player_history else ""
 
