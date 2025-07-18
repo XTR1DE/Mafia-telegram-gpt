@@ -3,6 +3,9 @@ import json
 
 def DataCreate(name, role, prompt : dict, mafias = None):
     try:
+        mafias_info = ""
+        if mafias is not None:
+            mafias_info = "Твои напарники: " + ", ".join(mafias)
         data = json.load(open('info.json', encoding='utf8'))
         for i in data['personal']:
             if name == i['name']:
@@ -13,7 +16,7 @@ def DataCreate(name, role, prompt : dict, mafias = None):
             'name': name,
             'role': role,
             'status': 'play',
-            'prompt': f"тебя зовут {name}. Ты играешь в игру 'мафия'. Вот правила игры. Не нарушай их." + prompt["all"] + prompt[role] + f"{f"Твои напарники: {",".join(mafias)}" if mafias is not None else ""}",
+            'prompt': f"тебя зовут {name}. Ты играешь в игру 'мафия'. Вот правила игры. Не нарушай их." + prompt["all"] + prompt[role] + mafias_info,
             'history': [],
             }
         )
